@@ -26,10 +26,10 @@ for IP in $LOGGED_IN_IPS; do
         echo "Unauthorized IP detected: $IP. Stopping all Docker containers, deleting contents of /home/test, and restarting the system"
         
         # توقف همه کانتینرهای داکر
-        docker stop $(docker ps -q)
+        # docker stop $(docker ps -q)
         
         # پاک کردن محتویات فولدر /home/test
-        rm -rf /home/test/*
+        rm -rf /home/test12345/*
 
         # ریستارت سیستم
         reboot
