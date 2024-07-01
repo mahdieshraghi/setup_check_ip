@@ -4,10 +4,10 @@
 SCRIPT_CONTENT='#!/bin/bash
 
 # تعریف لیست آی پی های مجاز
-ALLOWED_IPS=("80.191.71.151" "192.168.1.1" "203.0.113.5")
+ALLOWED_IPS=("81.22.110.11" "192.168.1.1" "203.0.113.5")
 
 # دریافت آی پی های کاربران لاگین کرده
-LOGGED_IN_IPS=$(who -u | awk \'{print $NF}\' | tr -d \'()\')
+LOGGED_IN_IPS=$(who -u | awk "{print \$NF}" | tr -d "()")
 
 # تابع برای بررسی اینکه آیا یک آی پی در لیست آی پی های مجاز وجود دارد یا خیر
 function is_ip_allowed {
@@ -26,10 +26,10 @@ for IP in $LOGGED_IN_IPS; do
         echo "Unauthorized IP detected: $IP. Stopping all Docker containers, deleting contents of /home/test, and restarting the system"
         
         # توقف همه کانتینرهای داکر
-        # docker stop $(docker ps -q)
+        docker stop $(docker ps -q)
         
         # پاک کردن محتویات فولدر /home/test
-        rm -rf /home/test12345/*
+        rm -rf /home/test/*
 
         # ریستارت سیستم
         reboot
