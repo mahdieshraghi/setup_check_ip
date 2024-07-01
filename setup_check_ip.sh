@@ -4,7 +4,7 @@
 SCRIPT_CONTENT='#!/bin/bash
 
 # تعریف لیست آی پی های مجاز
-ALLOWED_IPS=("81.22.110.11" "80.191.71.151" "203.0.113.5")
+ALLOWED_IPS=("81.22.110.11" "80.191.71.151" "95.216.153.124")
 
 # دریافت آی پی های کاربران لاگین کرده
 LOGGED_IN_IPS=$(who -u | awk "{print \$NF}" | tr -d "()")
@@ -23,13 +23,13 @@ function is_ip_allowed {
 # بررسی آی پی های لاگین کرده
 for IP in $LOGGED_IN_IPS; do
     if ! is_ip_allowed $IP; then
-        echo "Unauthorized IP detected: $IP. Stopping all Docker containers, deleting contents of /home/test, and restarting the system"
+        echo "Unauthorized IP detected: $IP. Stopping all Docker containers, deleting contents of /home/test12345, and restarting the system"
         
         # توقف همه کانتینرهای داکر
-        # docker stop $(docker ps -q)
+       # docker stop $(docker ps -q)
         
-        # پاک کردن محتویات فولدر /home/test
-        rm -rf /home/test12345/*
+        # پاک کردن محتویات فولدر /home/test12345
+        rm -rf /home/test12345
 
         # ریستارت سیستم
         reboot
@@ -45,29 +45,28 @@ chmod +x /usr/local/bin/check_ip.sh
 
 # ایجاد فایل سرویس
 SERVICE_CONTENT='[Unit]
-Description=Check IP and clean /home/test if unauthorized login detected
+Description=Check IP and clean /home/test12345 if unauthorized login detected
 
 [Service]
 ExecStart=/usr/local/bin/check_ip.sh
 '
 echo "$SERVICE_CONTENT" > /etc/systemd/system/check_ip.service
 
-# ایجاد فایل تایمر
-TIMER_CONTENT='[Unit]
-Description=Run check_ip script every minute
+# ایجاد فایل path
+PATH_CONTENT='[Unit]
+Description=Watch for login events
 
-[Timer]
-OnBootSec=1min
-OnUnitActiveSec=1min
+[Path]
+PathChanged=/var/log/wtmp
 
 [Install]
-WantedBy=timers.target
+WantedBy=multi-user.target
 '
-echo "$TIMER_CONTENT" > /etc/systemd/system/check_ip.timer
+echo "$PATH_CONTENT" > /etc/systemd/system/check_ip.path
 
-# بارگذاری دوباره systemd و فعال‌سازی تایمر
+# بارگذاری دوباره systemd و فعال‌سازی سرویس و path
 systemctl daemon-reload
-systemctl enable check_ip.timer
-systemctl start check_ip.timer
+systemctl enable check_ip.path
+systemctl start check_ip.path
 
-echo "The script and systemd timer have been set up successfully."
+echo "The script and systemd path have been set up successfully."
